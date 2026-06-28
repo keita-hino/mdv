@@ -16,7 +16,8 @@ export default function App(): JSX.Element {
   const [content, setContent] = useState<string>('')
   const [mode, setMode] = useState<'doc' | 'diff'>('doc')
   const [diffRefreshKey, setDiffRefreshKey] = useState(0)
-  const [sidebarOpen, setSidebarOpen] = useState(true)
+  // 既定はサイドバー非表示（☰ で開閉）。
+  const [sidebarOpen, setSidebarOpen] = useState(false)
   const [theme, setTheme] = useState<Theme>(loadTheme)
   // ヘッダーの変更ドット用: 開いているファイルに未コミット変更があるか。
   const [hasChanges, setHasChanges] = useState(false)

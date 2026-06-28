@@ -200,6 +200,7 @@ body {
 /* ---- Markdown body (GitHub風の最小限) ---- */
 .markdown-body {
   max-width: 900px;
+  margin: 0 auto;
   line-height: 1.6;
   font-size: 15px;
 }
@@ -301,7 +302,8 @@ body {
   border: 1px solid var(--border);
   border-radius: 6px;
   padding: 6px 12px;
-  margin-bottom: 16px;
+  max-width: 900px;
+  margin: 0 auto 16px;
 }
 
 .diff-legend {
