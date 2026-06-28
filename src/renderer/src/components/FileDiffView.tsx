@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import type { FileDiffResult } from '@shared/ipc'
 import MarkdownView from './MarkdownView'
 import { buildDiffMarkdown } from '../lib/diffMarkdown'
+import { MermaidDiffContext, buildMermaidDiffMap } from '../lib/mermaidDiff'
 
 interface Props {
   filePath: string
@@ -36,6 +37,15 @@ export default function FileDiffView({ filePath, refreshKey }: Props): JSX.Eleme
     [diff]
   )
 
+  // ER図プレビューで変更エンティティ/カラムを緑強調するためのマップ。
+  const mermaidDiffMap = useMemo(
+    () =>
+      diff && diff.status !== 'unchanged'
+        ? buildMermaidDiffMap(diff.oldText, diff.newText)
+        : null,
+    [diff]
+  )
+
   if (error) {
     return <div className="content-pane error">差分の取得に失敗しました: {error}</div>
   }
@@ -67,7 +77,9 @@ export default function FileDiffView({ filePath, refreshKey }: Props): JSX.Eleme
           <ins className="diff-ins">追加</ins> / <del className="diff-del">削除</del>
         </span>
       </div>
-      <MarkdownView content={diffMarkdown} allowRaw />
+      <MermaidDiffContext.Provider value={mermaidDiffMap}>
+        <MarkdownView content={diffMarkdown} allowRaw />
+      </MermaidDiffContext.Provider>
     </div>
   )
 }

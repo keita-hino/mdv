@@ -336,6 +336,31 @@ body {
   stroke-width: 2.5px !important;
 }
 
+/* 差分モードで変更（追加・属性/リレーション変更）があったエンティティを緑枠で強調 */
+.mermaid-container rect.mv-entity-changed {
+  stroke: #3fb950 !important;
+  stroke-width: 3px !important;
+}
+
+/* 変更/追加された属性（カラム）のセルを緑文字で強調 */
+.mermaid-container text.mv-attr-changed {
+  fill: #3fb950 !important;
+  font-weight: 700;
+}
+
+/* 変更前(HEAD)の図で、削除されたエンティティを赤枠で強調 */
+.mermaid-container rect.mv-entity-removed {
+  stroke: #f85149 !important;
+  stroke-width: 3px !important;
+}
+
+/* 削除された属性（カラム）のセルを赤文字＋取消線で強調 */
+.mermaid-container text.mv-attr-removed {
+  fill: #f85149 !important;
+  font-weight: 700;
+  text-decoration: line-through;
+}
+
 /* エンティティ名テキストにカーソルで「選べる」ことを示す */
 .mermaid-container text.entityLabel,
 .mermaid-container [id^='text-entity-'] {
