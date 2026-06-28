@@ -112,19 +112,6 @@ body {
   display: block;
 }
 
-/* 未コミット変更を示すバッジ（ボタン右上の小さなドット） */
-.diff-toggle .change-dot {
-  position: absolute;
-  top: -4px;
-  right: -4px;
-  width: 9px;
-  height: 9px;
-  border-radius: 50%;
-  background: #f0883e;
-  border: 2px solid var(--bg-alt);
-  box-sizing: content-box;
-}
-
 /* 右側の操作群（差分トグル・テーマ）を右端へ寄せる */
 .toolbar-right {
   margin-left: auto;

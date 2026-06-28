@@ -1,6 +1,5 @@
 interface Props {
   hasFile: boolean
-  hasChanges: boolean
   mode: 'doc' | 'diff'
   sidebarOpen: boolean
   theme: 'light' | 'dark'
@@ -31,7 +30,6 @@ function DiffIcon(): JSX.Element {
 
 export default function Toolbar({
   hasFile,
-  hasChanges,
   mode,
   sidebarOpen,
   theme,
@@ -57,7 +55,6 @@ export default function Toolbar({
         >
           <DiffIcon />
           <span>差分</span>
-          {hasFile && hasChanges && <span className="change-dot" title="未コミットの変更あり" />}
         </button>
         <button
           className="icon-btn"

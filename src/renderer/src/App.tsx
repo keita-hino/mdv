@@ -19,37 +19,21 @@ export default function App(): JSX.Element {
   // 既定はサイドバー非表示（☰ で開閉）。
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [theme, setTheme] = useState<Theme>(loadTheme)
-  // ヘッダーの変更ドット用: 開いているファイルに未コミット変更があるか。
-  const [hasChanges, setHasChanges] = useState(false)
 
   // ファイル更新コールバック内で最新の選択ファイルを参照するための ref。
   const selectedRef = useRef<TreeNode | null>(null)
   selectedRef.current = selectedFile
 
-  // 変更ドット用の状態を更新する（内容は読まない軽量判定）。
-  const refreshStatus = useCallback(async (path: string) => {
+  const loadFile = useCallback(async (path: string, name: string) => {
+    setSelectedFile({ name, path, type: 'file' })
+    setMode('doc')
     try {
-      const st = await window.api.getFileStatus(path)
-      setHasChanges(st.isRepo && st.hasChanges)
-    } catch {
-      setHasChanges(false)
+      const text = await window.api.readFile(path)
+      setContent(text)
+    } catch (e) {
+      setContent('ファイルの読み込みに失敗しました: ' + (e instanceof Error ? e.message : String(e)))
     }
   }, [])
-
-  const loadFile = useCallback(
-    async (path: string, name: string) => {
-      setSelectedFile({ name, path, type: 'file' })
-      setMode('doc')
-      try {
-        const text = await window.api.readFile(path)
-        setContent(text)
-      } catch (e) {
-        setContent('ファイルの読み込みに失敗しました: ' + (e instanceof Error ? e.message : String(e)))
-      }
-      refreshStatus(path)
-    },
-    [refreshStatus]
-  )
 
   // ルート（と任意の初期ファイル）を読み込む共通処理。
   const loadRoot = useCallback(
@@ -58,7 +42,6 @@ export default function App(): JSX.Element {
       setSelectedFile(null)
       setContent('')
       setMode('doc')
-      setHasChanges(false)
       const t = await window.api.getTree(root)
       setTree(t)
       if (file) {
@@ -125,12 +108,11 @@ export default function App(): JSX.Element {
       } catch {
         // 一時的に読めない場合（保存途中など）は次の通知で再取得される。
       }
-      // 差分表示中なら再取得をトリガし、変更ドットも更新する。
+      // 差分表示中なら再取得をトリガする。
       setDiffRefreshKey((k) => k + 1)
-      refreshStatus(current.path)
     })
     return unsubscribe
-  }, [refreshStatus])
+  }, [])
 
   // Cmd/Ctrl+O でフォルダを開く。
   useEffect(() => {
@@ -149,7 +131,6 @@ export default function App(): JSX.Element {
     <div className="app">
       <Toolbar
         hasFile={!!selectedFile}
-        hasChanges={hasChanges}
         mode={mode}
         sidebarOpen={sidebarOpen}
         theme={theme}

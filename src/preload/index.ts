@@ -5,7 +5,6 @@ import {
   type OpenFolderResult,
   type TreeNode,
   type FileDiffResult,
-  type FileStatusResult,
   type InitialTarget
 } from '@shared/ipc'
 
@@ -15,8 +14,6 @@ const api: MarkdownViewerApi = {
   readFile: (path: string): Promise<string> => ipcRenderer.invoke(IPC.readFile, path),
   getFileDiff: (filePath: string): Promise<FileDiffResult> =>
     ipcRenderer.invoke(IPC.getFileDiff, filePath),
-  getFileStatus: (filePath: string): Promise<FileStatusResult> =>
-    ipcRenderer.invoke(IPC.getFileStatus, filePath),
   getInitialTarget: (): Promise<InitialTarget | null> => ipcRenderer.invoke(IPC.getInitialTarget),
   watchFile: (filePath: string | null): Promise<void> =>
     ipcRenderer.invoke(IPC.watchFile, filePath),

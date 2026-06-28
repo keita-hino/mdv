@@ -5,7 +5,6 @@ export const IPC = {
   getTree: 'tree:get',
   readFile: 'file:read',
   getFileDiff: 'git:fileDiff',
-  getFileStatus: 'git:fileStatus',
   getInitialTarget: 'app:getInitialTarget',
   watchFile: 'watch:file',
   // main -> renderer のイベント（ファイル更新通知）。
@@ -35,13 +34,7 @@ export interface FileDiffResult {
   status: 'added' | 'modified' | 'unchanged'
 }
 
-// ヘッダーの変更ドット用の軽量なファイル状態（内容は読まない）。
-export interface FileStatusResult {
-  isRepo: boolean
-  hasChanges: boolean
-}
-
-// CLI（markdown <path>）で指定された初期表示対象。
+// CLI（mdv <path>）で指定された初期表示対象。
 // ファイル指定時は root=親ディレクトリ / file=そのファイル、
 // フォルダ指定時は root=そのフォルダ / file=null。
 export interface InitialTarget {
@@ -55,7 +48,6 @@ export interface MarkdownViewerApi {
   getTree(root: string): Promise<TreeNode>
   readFile(path: string): Promise<string>
   getFileDiff(filePath: string): Promise<FileDiffResult>
-  getFileStatus(filePath: string): Promise<FileStatusResult>
   getInitialTarget(): Promise<InitialTarget | null>
   // 指定ファイルの更新監視を開始する（null で監視解除）。
   watchFile(filePath: string | null): Promise<void>
