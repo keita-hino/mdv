@@ -1,6 +1,6 @@
 #!/usr/bin/env node
-// CLI エントリ: `markdown <file|dir>` でビューアを起動する。
-// 例: markdown README.md / markdown ./docs / markdown （引数なし=カレントディレクトリ）
+// CLI エントリ: `mdv <file|dir>` でビューアを起動する。
+// 例: mdv README.md / mdv ./docs / mdv （引数なし=カレントディレクトリ）
 
 const { spawn, spawnSync } = require('child_process')
 const path = require('path')

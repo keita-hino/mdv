@@ -1,12 +1,12 @@
 {
-  "name": "markdown-viewer",
+  "name": "mdv",
   "version": "0.1.0",
-  "description": "SDD向け Markdown Viewer (Mermaid ER選択 / git差分対応)",
+  "description": "Markdown プレビューア (Mermaid ER選択 / git差分の可視化対応)",
   "main": "./out/main/index.js",
   "author": "keitahino",
   "license": "MIT",
   "bin": {
-    "markdown": "./bin/markdown.js"
+    "mdv": "./bin/mdv.js"
   },
   "scripts": {
     "dev": "electron-vite dev",
