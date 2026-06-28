@@ -3,6 +3,8 @@ interface Props {
   hasFile: boolean
   mode: 'doc' | 'diff'
   sidebarOpen: boolean
+  theme: 'light' | 'dark'
+  onToggleTheme: () => void
   onToggleSidebar: () => void
   onOpenFolder: () => void
   onModeChange: (mode: 'doc' | 'diff') => void
@@ -14,6 +16,8 @@ export default function Toolbar({
   hasFile,
   mode,
   sidebarOpen,
+  theme,
+  onToggleTheme,
   onToggleSidebar,
   onOpenFolder,
   onModeChange,
@@ -52,6 +56,13 @@ export default function Toolbar({
       <span className="toolbar-path" title={rootPath ?? ''}>
         {rootPath ?? 'フォルダ未選択'}
       </span>
+      <button
+        className="icon-btn"
+        onClick={onToggleTheme}
+        title={theme === 'dark' ? 'ライトモードに切替' : 'ダークモードに切替'}
+      >
+        {theme === 'dark' ? '☀' : '☾'}
+      </button>
     </div>
   )
 }

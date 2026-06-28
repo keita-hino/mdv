@@ -4,6 +4,10 @@ import Toolbar from './components/Toolbar'
 import FileTree from './components/FileTree'
 import MarkdownView from './components/MarkdownView'
 import FileDiffView from './components/FileDiffView'
+import { ThemeContext, loadTheme, saveTheme, type Theme } from './lib/theme'
+// highlight.js テーマはテーマに応じて差し替える（同時に1つだけ注入）。
+import githubLight from 'highlight.js/styles/github.css?inline'
+import githubDark from 'highlight.js/styles/github-dark.css?inline'
 
 export default function App(): JSX.Element {
   const [rootPath, setRootPath] = useState<string | null>(null)
@@ -13,6 +17,7 @@ export default function App(): JSX.Element {
   const [mode, setMode] = useState<'doc' | 'diff'>('doc')
   const [diffRefreshKey, setDiffRefreshKey] = useState(0)
   const [sidebarOpen, setSidebarOpen] = useState(true)
+  const [theme, setTheme] = useState<Theme>(loadTheme)
 
   // ファイル更新コールバック内で最新の選択ファイルを参照するための ref。
   const selectedRef = useRef<TreeNode | null>(null)
@@ -66,6 +71,23 @@ export default function App(): JSX.Element {
     })
   }, [loadRoot])
 
+  // テーマを適用する: data-theme 属性 + highlight.js テーマ差し替え + 永続化。
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme
+    let styleEl = document.getElementById('hljs-theme') as HTMLStyleElement | null
+    if (!styleEl) {
+      styleEl = document.createElement('style')
+      styleEl.id = 'hljs-theme'
+      document.head.appendChild(styleEl)
+    }
+    styleEl.textContent = theme === 'dark' ? githubDark : githubLight
+    saveTheme(theme)
+  }, [theme])
+
+  const toggleTheme = useCallback(() => {
+    setTheme((t) => (t === 'dark' ? 'light' : 'dark'))
+  }, [])
+
   // 選択中ファイルの更新監視を開始/切り替える（未選択なら解除）。
   useEffect(() => {
     window.api.watchFile(selectedFile?.path ?? null)
@@ -104,12 +126,15 @@ export default function App(): JSX.Element {
   }, [openFolder])
 
   return (
+    <ThemeContext.Provider value={theme}>
     <div className="app">
       <Toolbar
         rootPath={rootPath}
         hasFile={!!selectedFile}
         mode={mode}
         sidebarOpen={sidebarOpen}
+        theme={theme}
+        onToggleTheme={toggleTheme}
         onToggleSidebar={() => setSidebarOpen((v) => !v)}
         onOpenFolder={openFolder}
         onModeChange={setMode}
@@ -140,5 +165,6 @@ export default function App(): JSX.Element {
         </main>
       </div>
     </div>
+    </ThemeContext.Provider>
   )
 }

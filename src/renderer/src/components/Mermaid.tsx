@@ -1,18 +1,7 @@
-import { useEffect, useRef, useState } from 'react'
+import { useContext, useEffect, useRef, useState } from 'react'
 import mermaid from 'mermaid'
 import { attachEntitySelection } from '../lib/mermaidSelection'
-
-let initialized = false
-function initMermaid(): void {
-  if (initialized) return
-  mermaid.initialize({
-    startOnLoad: false,
-    securityLevel: 'strict',
-    theme: 'default',
-    er: { useMaxWidth: true }
-  })
-  initialized = true
-}
+import { ThemeContext } from '../lib/theme'
 
 // 描画 ID 用の単調増加カウンタ（Math.random は使わない方針）。
 let renderSeq = 0
@@ -22,11 +11,18 @@ interface Props {
 }
 
 export default function Mermaid({ code }: Props): JSX.Element {
+  const theme = useContext(ThemeContext)
   const containerRef = useRef<HTMLDivElement>(null)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    initMermaid()
+    // テーマ変更時にも再初期化して図の配色を合わせる（dark/default を切替）。
+    mermaid.initialize({
+      startOnLoad: false,
+      securityLevel: 'strict',
+      theme: theme === 'dark' ? 'dark' : 'default',
+      er: { useMaxWidth: true }
+    })
     const container = containerRef.current
     if (!container) return
 
@@ -52,7 +48,7 @@ export default function Mermaid({ code }: Props): JSX.Element {
       cancelled = true
       detach?.()
     }
-  }, [code])
+  }, [code, theme])
 
   if (error) {
     return (
