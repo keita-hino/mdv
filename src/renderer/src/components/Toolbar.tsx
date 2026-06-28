@@ -1,5 +1,6 @@
 interface Props {
   hasFile: boolean
+  hasChanges: boolean
   mode: 'doc' | 'diff'
   sidebarOpen: boolean
   theme: 'light' | 'dark'
@@ -11,6 +12,7 @@ interface Props {
 
 export default function Toolbar({
   hasFile,
+  hasChanges,
   mode,
   sidebarOpen,
   theme,
@@ -28,33 +30,25 @@ export default function Toolbar({
       >
         ☰
       </button>
-      <div className="toolbar-tabs">
+      <div className="toolbar-right">
+        {mode === 'diff' && hasFile && <button onClick={onRefreshDiff}>🔄 更新</button>}
         <button
-          className={mode === 'doc' ? 'active' : ''}
-          onClick={() => onModeChange('doc')}
+          className={'diff-check' + (mode === 'diff' ? ' active' : '')}
+          onClick={() => onModeChange(mode === 'diff' ? 'doc' : 'diff')}
           disabled={!hasFile}
+          title="開いているファイルの git 差分を変更ハイライト付きで表示（再押下で通常表示）"
         >
-          表示
+          <span className="check-box">{mode === 'diff' ? '☑' : '☐'}</span> 差分
+          {hasFile && hasChanges && <span className="change-dot" title="未コミットの変更あり" />}
         </button>
         <button
-          className={mode === 'diff' ? 'active' : ''}
-          onClick={() => onModeChange('diff')}
-          disabled={!hasFile}
-          title="開いているファイルの git 差分を変更ハイライト付きで表示"
+          className="icon-btn"
+          onClick={onToggleTheme}
+          title={theme === 'dark' ? 'ライトモードに切替' : 'ダークモードに切替'}
         >
-          差分
+          {theme === 'dark' ? '☀' : '☾'}
         </button>
       </div>
-      {mode === 'diff' && hasFile && (
-        <button onClick={onRefreshDiff}>🔄 更新</button>
-      )}
-      <button
-        className="icon-btn theme-btn"
-        onClick={onToggleTheme}
-        title={theme === 'dark' ? 'ライトモードに切替' : 'ダークモードに切替'}
-      >
-        {theme === 'dark' ? '☀' : '☾'}
-      </button>
     </div>
   )
 }

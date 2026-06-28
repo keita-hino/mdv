@@ -94,20 +94,34 @@ body {
   line-height: 1;
 }
 
-.toolbar-tabs {
-  display: flex;
-  gap: 4px;
-}
-
-.toolbar-tabs button.active {
+.toolbar button.active {
   background: var(--accent);
   color: #fff;
   border-color: var(--accent);
 }
 
-/* テーマ切替ボタンを右端へ寄せる */
-.toolbar .theme-btn {
+/* 未コミット変更を示すドット */
+.change-dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  margin-left: 5px;
+  vertical-align: middle;
+  border-radius: 50%;
+  background: #f0883e;
+}
+
+/* 右側の操作群（差分トグル・テーマ）を右端へ寄せる */
+.toolbar-right {
   margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* チェックボックス式の差分トグル */
+.toolbar button.diff-check .check-box {
+  font-size: 14px;
 }
 
 /* ---- Layout ---- */
