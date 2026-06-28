@@ -156,7 +156,6 @@ export default function App(): JSX.Element {
         onToggleTheme={toggleTheme}
         onToggleSidebar={() => setSidebarOpen((v) => !v)}
         onModeChange={setMode}
-        onRefreshDiff={() => setDiffRefreshKey((k) => k + 1)}
       />
       <div className="main">
         <aside className={'sidebar' + (sidebarOpen ? '' : ' collapsed')}>

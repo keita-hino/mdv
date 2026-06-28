@@ -7,7 +7,26 @@ interface Props {
   onToggleTheme: () => void
   onToggleSidebar: () => void
   onModeChange: (mode: 'doc' | 'diff') => void
-  onRefreshDiff: () => void
+}
+
+// 差分を表すアイコン（+ と - を上下に）。色はボタンの文字色に追従。
+function DiffIcon(): JSX.Element {
+  return (
+    <svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true">
+      <g
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        fill="none"
+      >
+        {/* plus */}
+        <line x1="4" y1="2.5" x2="4" y2="7.5" />
+        <line x1="1.5" y1="5" x2="6.5" y2="5" />
+        {/* minus */}
+        <line x1="9.5" y1="11" x2="14.5" y2="11" />
+      </g>
+    </svg>
+  )
 }
 
 export default function Toolbar({
@@ -18,8 +37,7 @@ export default function Toolbar({
   theme,
   onToggleTheme,
   onToggleSidebar,
-  onModeChange,
-  onRefreshDiff
+  onModeChange
 }: Props): JSX.Element {
   return (
     <div className="toolbar">
@@ -31,14 +49,14 @@ export default function Toolbar({
         ☰
       </button>
       <div className="toolbar-right">
-        {mode === 'diff' && hasFile && <button onClick={onRefreshDiff}>🔄 更新</button>}
         <button
-          className={'diff-check' + (mode === 'diff' ? ' active' : '')}
+          className={'diff-toggle' + (mode === 'diff' ? ' active' : '')}
           onClick={() => onModeChange(mode === 'diff' ? 'doc' : 'diff')}
           disabled={!hasFile}
           title="開いているファイルの git 差分を変更ハイライト付きで表示（再押下で通常表示）"
         >
-          <span className="check-box">{mode === 'diff' ? '☑' : '☐'}</span> 差分
+          <DiffIcon />
+          <span>差分</span>
           {hasFile && hasChanges && <span className="change-dot" title="未コミットの変更あり" />}
         </button>
         <button

@@ -100,15 +100,29 @@ body {
   border-color: var(--accent);
 }
 
-/* 未コミット変更を示すドット */
-.change-dot {
-  display: inline-block;
-  width: 7px;
-  height: 7px;
-  margin-left: 5px;
-  vertical-align: middle;
+/* 差分トグル: アイコン＋ラベルのピル型ボタン */
+.toolbar button.diff-toggle {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.toolbar button.diff-toggle svg {
+  display: block;
+}
+
+/* 未コミット変更を示すバッジ（ボタン右上の小さなドット） */
+.diff-toggle .change-dot {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  width: 9px;
+  height: 9px;
   border-radius: 50%;
   background: #f0883e;
+  border: 2px solid var(--bg-alt);
+  box-sizing: content-box;
 }
 
 /* 右側の操作群（差分トグル・テーマ）を右端へ寄せる */
@@ -117,11 +131,6 @@ body {
   display: flex;
   align-items: center;
   gap: 8px;
-}
-
-/* チェックボックス式の差分トグル */
-.toolbar button.diff-check .check-box {
-  font-size: 14px;
 }
 
 /* ---- Layout ---- */
