@@ -129,14 +129,12 @@ export default function App(): JSX.Element {
     <ThemeContext.Provider value={theme}>
     <div className="app">
       <Toolbar
-        rootPath={rootPath}
         hasFile={!!selectedFile}
         mode={mode}
         sidebarOpen={sidebarOpen}
         theme={theme}
         onToggleTheme={toggleTheme}
         onToggleSidebar={() => setSidebarOpen((v) => !v)}
-        onOpenFolder={openFolder}
         onModeChange={setMode}
         onRefreshDiff={() => setDiffRefreshKey((k) => k + 1)}
       />

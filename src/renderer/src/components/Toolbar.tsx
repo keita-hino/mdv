@@ -1,25 +1,21 @@
 interface Props {
-  rootPath: string | null
   hasFile: boolean
   mode: 'doc' | 'diff'
   sidebarOpen: boolean
   theme: 'light' | 'dark'
   onToggleTheme: () => void
   onToggleSidebar: () => void
-  onOpenFolder: () => void
   onModeChange: (mode: 'doc' | 'diff') => void
   onRefreshDiff: () => void
 }
 
 export default function Toolbar({
-  rootPath,
   hasFile,
   mode,
   sidebarOpen,
   theme,
   onToggleTheme,
   onToggleSidebar,
-  onOpenFolder,
   onModeChange,
   onRefreshDiff
 }: Props): JSX.Element {
@@ -32,7 +28,6 @@ export default function Toolbar({
       >
         ☰
       </button>
-      <button onClick={onOpenFolder}>📂 フォルダを開く</button>
       <div className="toolbar-tabs">
         <button
           className={mode === 'doc' ? 'active' : ''}
@@ -53,11 +48,8 @@ export default function Toolbar({
       {mode === 'diff' && hasFile && (
         <button onClick={onRefreshDiff}>🔄 更新</button>
       )}
-      <span className="toolbar-path" title={rootPath ?? ''}>
-        {rootPath ?? 'フォルダ未選択'}
-      </span>
       <button
-        className="icon-btn"
+        className="icon-btn theme-btn"
         onClick={onToggleTheme}
         title={theme === 'dark' ? 'ライトモードに切替' : 'ダークモードに切替'}
       >
