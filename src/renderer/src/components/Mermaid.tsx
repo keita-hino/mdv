@@ -7,6 +7,13 @@ import { MermaidDiffContext } from '../lib/mermaidDiff'
 // 描画 ID 用の単調増加カウンタ（Math.random は使わない方針）。
 let renderSeq = 0
 
+const MIN_SCALE = 0.3
+const MAX_SCALE = 8
+
+function clamp(v: number, min: number, max: number): number {
+  return Math.min(max, Math.max(min, v))
+}
+
 // エンティティの箱に指定クラスを付与する（緑=変更/赤=削除）。
 function highlightEntities(container: HTMLElement, names: string[], cls: string): void {
   const set = new Set(names)
@@ -43,7 +50,19 @@ export default function Mermaid({ code }: Props): JSX.Element {
   const theme = useContext(ThemeContext)
   const diffMap = useContext(MermaidDiffContext)
   const containerRef = useRef<HTMLDivElement>(null)
+  const zoomRef = useRef<HTMLDivElement>(null)
+  // 図の基準サイズ（viewBox）と現在の拡大率。ズームは DOM 直接操作で行う。
+  const baseRef = useRef<{ w: number; h: number }>({ w: 0, h: 0 })
+  const scaleRef = useRef(1)
   const [error, setError] = useState<string | null>(null)
+
+  // 拡大率に応じてズーム用 div の幅を更新する（svg は width:100% で追従）。
+  function applyScale(): void {
+    const zoom = zoomRef.current
+    const { w } = baseRef.current
+    if (!zoom || !w) return
+    zoom.style.width = `${w * scaleRef.current}px`
+  }
 
   useEffect(() => {
     // テーマ変更時にも再初期化して図の配色を合わせる（dark/default を切替）。
@@ -53,8 +72,8 @@ export default function Mermaid({ code }: Props): JSX.Element {
       theme: theme === 'dark' ? 'dark' : 'default',
       er: { useMaxWidth: true }
     })
-    const container = containerRef.current
-    if (!container) return
+    const zoom = zoomRef.current
+    if (!zoom) return
 
     let cancelled = false
     let detach: (() => void) | null = null
@@ -63,18 +82,26 @@ export default function Mermaid({ code }: Props): JSX.Element {
     mermaid
       .render(id, code)
       .then(({ svg }) => {
-        if (cancelled || !container) return
-        container.innerHTML = svg
+        if (cancelled || !zoom) return
+        zoom.innerHTML = svg
         setError(null)
+
+        // 基準サイズを viewBox から取得し、拡大率を初期化する。
+        const svgEl = zoom.querySelector('svg')
+        const vb = svgEl?.viewBox?.baseVal
+        baseRef.current = { w: vb?.width || svgEl?.clientWidth || 800, h: vb?.height || 600 }
+        scaleRef.current = 1
+        applyScale()
+
         // 描画後に ER 図のテーブル名ダブルクリック選択を装着する。
-        detach = attachEntitySelection(container)
+        detach = attachEntitySelection(zoom)
         // 差分モード: 変更後の図は緑（追加/変更）、変更前の図は赤（削除）で強調。
         const blockDiff = diffMap?.get(code.trim())
         if (blockDiff) {
-          highlightEntities(container, blockDiff.changedEntities, 'mv-entity-changed')
-          highlightAttrs(container, blockDiff.changedAttrs, 'mv-attr-changed')
-          highlightEntities(container, blockDiff.removedEntities, 'mv-entity-removed')
-          highlightAttrs(container, blockDiff.removedAttrs, 'mv-attr-removed')
+          highlightEntities(zoom, blockDiff.changedEntities, 'mv-entity-changed')
+          highlightAttrs(zoom, blockDiff.changedAttrs, 'mv-attr-changed')
+          highlightEntities(zoom, blockDiff.removedEntities, 'mv-entity-removed')
+          highlightAttrs(zoom, blockDiff.removedAttrs, 'mv-attr-removed')
         }
       })
       .catch((e: unknown) => {
@@ -88,6 +115,37 @@ export default function Mermaid({ code }: Props): JSX.Element {
     }
   }, [code, theme, diffMap])
 
+  // トラックパッドのピンチ（ctrl+wheel）で拡大縮小。カーソル位置を基準に保つ。
+  useEffect(() => {
+    const container = containerRef.current
+    const zoom = zoomRef.current
+    if (!container || !zoom) return
+
+    const onWheel = (e: WheelEvent): void => {
+      if (!e.ctrlKey) return // 通常スクロールはそのまま
+      e.preventDefault()
+      const rect = container.getBoundingClientRect()
+      const offX = e.clientX - rect.left
+      const offY = e.clientY - rect.top
+      const oldW = zoom.offsetWidth || 1
+      const oldH = zoom.offsetHeight || 1
+      const rx = (container.scrollLeft + offX) / oldW
+      const ry = (container.scrollTop + offY) / oldH
+
+      const next = clamp(scaleRef.current * Math.exp(-e.deltaY * 0.01), MIN_SCALE, MAX_SCALE)
+      if (next === scaleRef.current) return
+      scaleRef.current = next
+      applyScale()
+
+      // カーソル下の点が動かないようスクロール位置を補正。
+      container.scrollLeft = rx * zoom.offsetWidth - offX
+      container.scrollTop = ry * zoom.offsetHeight - offY
+    }
+
+    container.addEventListener('wheel', onWheel, { passive: false })
+    return () => container.removeEventListener('wheel', onWheel)
+  }, [])
+
   if (error) {
     return (
       <pre className="mermaid-error">
@@ -97,5 +155,9 @@ export default function Mermaid({ code }: Props): JSX.Element {
     )
   }
 
-  return <div className="mermaid-container" ref={containerRef} />
+  return (
+    <div className="mermaid-container" ref={containerRef}>
+      <div className="mermaid-zoom" ref={zoomRef} />
+    </div>
+  )
 }

@@ -271,11 +271,19 @@ body {
 .mermaid-container {
   margin: 16px 0;
   text-align: center;
+  overflow: auto; /* ピンチ拡大ではみ出した分はスクロール */
+}
+
+/* ズーム対象のラッパー。幅を JS で拡大率に応じて変える（svg は width:100% で追従） */
+.mermaid-zoom {
+  display: inline-block;
 }
 
 .mermaid-container svg {
-  max-width: 100%;
-  height: auto;
+  display: block;
+  width: 100% !important;
+  max-width: none !important;
+  height: auto !important;
 }
 
 .mermaid-error {
